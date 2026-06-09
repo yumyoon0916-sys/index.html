@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YoonHeejeong | Portfolio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+
+    <style>
+   
+        :root {
+            --main-bg-color: #000;
+            --main-text-color: #fff;
+            --inverse-bg-color: #fff;
+            --inverse-text-color: #000;
+            --highlight-color: #888;
+            --modal-bg-color: rgba(5, 5, 5, 0.98);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body, html {
+            width: 100%; min-height: 100vh;
+            background-color: var(--main-bg-color); color: var(--main-text-color);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+
+        nav#top-nav {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 2vw 5vw; display: flex; justify-content: space-between;
+            z-index: 100; mix-blend-mode: difference; pointer-events: auto;
+        }
+        .nav-left { display: flex; gap: 3vw; }
+        nav#top-nav a {
+            color: var(--main-text-color); text-decoration: none; text-transform: uppercase;
+            font-size: 0.85vw; font-weight: 400; letter-spacing: 0.1em;
+            transition: opacity 0.3s ease;
+        }
+        nav#top-nav a:hover { opacity: 0.5; }
+
+        #global-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0; pointer-events: none;
+        }
+        #mask-wrapper {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10; pointer-events: none; display: flex;
+            align-items: center; justify-content: center;
+        }
+        #blob-svg { width: 120vmax; height: 120vmax; transform-origin: center center; }
+
+        .intro-bottom-text {
+            position: fixed; bottom: 5vh; left: 5vw; z-index: 15;
+            color: var(--inverse-text-color); font-size: 1.5vw; font-weight: 500;
+            line-height: 1.2; letter-spacing: -0.01em;
+        }
+        #intro-spacer { height: 300vh; }
+
+
+        .row { width: 100%; }
+
+        section#furuya-section {
+            position: relative; width: 100%; height: 100vh;
+            background-color: transparent; z-index: 20;
+            display: flex; align-items: center; padding: 0 5vw;
+        }
+        .content-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 1) 100%);
+            z-index: -1;
+        }
+        .about-row { display: flex; align-items: center; width: 100%; }
+        
+        .left-panel { width: 30%; position: relative; height: 15vw; }
+        .core-values-label { font-size: 1vw; font-weight: 400; color: var(--highlight-color); margin-bottom: 0.5rem; }
+        .main-label-wrapper { position: relative; width: 100%; height: 10vw; }
+        .main-label {
+            position: absolute; top: 0; left: 0; font-size: 5.5vw;
+            font-weight: 500; letter-spacing: -0.02em; opacity: 0;
+            transform: translateY(20px); transition: all 0.4s ease;
+        }
+        .main-label.active { opacity: 1; transform: translateY(0); }
+
+        .right-panel { width: 70%; padding-left: 4vw; }
+        .about-paragraph { font-size: 2.5vw; font-weight: 400; line-height: 1.3; letter-spacing: -0.01em; }
+        .right-text-span { color: #444; transition: color 0.4s ease; }
+        .right-text-span.active { color: var(--main-text-color); }
+
+        #transition-band {
+            position: relative; width: 100%; height: 20vh;
+            background: linear-gradient(to bottom, #000000 0%, #ffffff 100%); z-index: 20;
+        }
+
+     
+        section#works-section {
+            position: relative; width: 100%; background-color: var(--inverse-bg-color);
+            color: var(--inverse-text-color); z-index: 20; padding: 5vw 5vw 15vw;
+        }
+        .works-title {
+            font-family: 'Playfair Display', serif; font-size: 5.5vw;
+            font-style: italic; font-weight: 400; text-align: center;
+            margin-bottom: 3vw; text-transform: uppercase;
+        }
+
+        .category-filters {
+            display: flex; justify-content: center; gap: 4vw;
+            margin-bottom: 6vw; flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: none; border: none; font-size: 1.1vw;
+            font-family: 'Helvetica Neue', sans-serif; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            color: #ccc; cursor: pointer; transition: color 0.3s ease;
+            padding-bottom: 0.2vw; border-bottom: 1px solid transparent;
+        }
+        .filter-btn:hover { color: #555; }
+        .filter-btn.active { color: var(--inverse-text-color); border-bottom: 1px solid var(--inverse-text-color); }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(28%, 1fr));
+            gap: 5vw 3vw; 
+            align-items: start;
+            min-height: 60vh;
+        }
+
+        .work-item {
+            position: relative; cursor: pointer; display: none;
+            opacity: 0; transform: translateY(30px);
+            transition: transform 0.4s ease, opacity 0.6s ease;
+        }
+        .work-item.show { display: block; }
+        .work-item.reveal { opacity: 1; transform: translateY(0); }
+        .work-item:hover { transform: translateY(-5px); }
+
+        .img-wrapper { overflow: hidden; width: 100%; background: #f5f5f5; aspect-ratio: 4/5; position: relative; }
+        .img-wrapper img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: grayscale(100%); transition: filter 0.5s ease, transform 0.5s ease;
+        }
+        .work-item:hover .img-wrapper img { filter: grayscale(0%); transform: scale(1.03); }
+
+        .work-label {
+            margin-top: 1.5vw; display: flex; justify-content: space-between; align-items: baseline;
+            border-top: 1px solid #e0e0e0; padding-top: 0.8vw;
+        }
+        
+
+        .work-item-title {
+            font-size: 1.1vw; font-weight: 500; color: var(--inverse-text-color);
+            transition: all 0.4s ease; margin: 0;
+        }
+        .work-item:hover .work-item-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic; font-weight: 400; font-size: 1.3vw;
+            letter-spacing: 0.02em;
+        }
+        .work-item-category { 
+            font-size: 0.8vw; color: var(--highlight-color); text-transform: uppercase; 
+            letter-spacing: 0.05em; margin: 0; 
+        }
+
+        .series-icon {
+            position: absolute; top: 1vw; right: 1vw;
+            background: rgba(0,0,0,0.5); color: var(--main-text-color); font-size: 0.8vw;
+            padding: 0.3vw 0.6vw; border-radius: 20px;
+        }
+
+    
+        #project-modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--modal-bg-color); color: var(--main-text-color); z-index: 2000;
+            display: flex; opacity: 0; pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #project-modal.active { opacity: 1; pointer-events: auto; }
+
+        .modal-close {
+            position: absolute; top: 3vw; right: 4vw; background: none; border: none;
+            color: var(--main-text-color); font-size: 2.5vw; cursor: pointer; transition: transform 0.3s ease; z-index: 10;
+        }
+        .modal-close:hover { transform: rotate(90deg); }
+
+        .modal-content { display: flex; width: 100%; height: 100%; padding: 6vw 5vw 4vw; gap: 5vw; }
+        
+        .modal-left { 
+            width: 65%; height: 100%; position: relative; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        }
+        .modal-left img { max-width: 100%; max-height: 90%; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .modal-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1); border: none; color: var(--main-text-color);
+            width: 3.5vw; height: 3.5vw; border-radius: 50%; font-size: 1.5vw;
+            cursor: pointer; display: none; transition: background 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-nav:hover { background: rgba(255, 255, 255, 0.3); }
+        #modal-prev { left: 0; }
+        #modal-next { right: 0; }
+        #modal-counter { margin-top: 1vw; font-size: 0.9vw; color: var(--highlight-color); letter-spacing: 0.1em; display: none; margin-bottom: 0; }
+
+        .modal-right { width: 35%; display: flex; flex-direction: column; justify-content: center; }
+        #modal-title { font-family: 'Playfair Display', serif; font-size: 3.5vw; font-style: italic; font-weight: 400; margin-bottom: 1vw; line-height: 1.1; margin-top: 0; }
+        #modal-caption { font-size: 0.9vw; color: var(--highlight-color); font-weight: 400; margin-bottom: 3vw; letter-spacing: 0.05em; text-transform: uppercase; margin-top:0; }
+        #modal-desc { font-size: 1.1vw; line-height: 1.7; color: #ccc; font-weight: 300; margin: 0; }
+
+        /* ========== CONTACT SECTION ========== */
+        #contact-transition { width: 100%; height: 15vh; background: linear-gradient(to bottom, #ffffff 0%, #000000 100%); z-index: 20; position: relative; }
+        
+        footer#contact-section {
+            position: relative; width: 100%; height: 80vh; background-color: var(--main-bg-color); z-index: 20; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .contact-row { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
+
+        .marquee-wrapper { width: 100%; overflow: hidden; white-space: nowrap; margin-bottom: 5vw; }
+        .marquee {
+            display: inline-block; font-size: 8vw; font-weight: bold; font-style: italic;
+            font-family: 'Playfair Display', serif; color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+            animation: marqueeText 20s linear infinite;
+        }
+        .marquee span { margin-right: 2vw; }
+        @keyframes marqueeText { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        
+        .contact-links { display: flex; gap: 4vw; position: relative; z-index: 2; }
+        .contact-links a {
+            color: var(--main-text-color); font-size: 1.5vw; text-decoration: none; text-transform: uppercase;
+            letter-spacing: 0.1em; border-bottom: 1px solid transparent; transition: border-bottom 0.3s ease;
+        }
+        .contact-links a:hover { border-bottom: 1px solid var(--main-text-color); }
+        .footer-copy { position: absolute; bottom: 3vw; font-size: 0.8vw; color: #555; margin: 0; }
+
+        /* 미디어 쿼리 (반응형) */
+        @media only screen and (max-width: 833px) {
+            .about-row { flex-direction: column; align-items: flex-start; }
+            .left-panel, .right-panel { width: 100%; padding-left: 0; }
+            .works-grid { grid-template-columns: repeat(auto-fill, minmax(45%, 1fr)); }
+            .modal-content { flex-direction: column; overflow-y: auto; }
+            .modal-left, .modal-right { width: 100%; height: auto; }
+            .modal-left { min-height: 50vh; }
+        }
+    </style>
+</head>
+
+<body id="top">
+
+    <nav id="top-nav">
+        <div class="nav-left">
+            <a href="#furuya-section">About</a>
+            <a href="#works-section">Work</a>
+            <a href="#contact-section">Contact</a>
+        </div>
+        <div class="nav-right">
+            <a href="#top">Yoon Hee jeong</a>
+        </div>
+    </nav>
+
+    <canvas id="global-canvas"></canvas>
+    <div id="mask-wrapper">
+        <svg id="blob-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+            <path fill="#ffffff" fill-rule="evenodd" d="M-100,-100 H200 V200 H-100 Z M 50,10 C 55,35 75,35 90,40 C 70,55 80,85 50,90 C 20,85 30,55 10,40 C 25,35 45,35 50,10 Z" />
+        </svg>
+    </div>
+
+    <div class="intro-bottom-text" id="intro-text">
+        <p>YoonHeejeong<br>Portfolio</p>
+    </div>
+    <div id="intro-spacer"></div>
+
+    <section id="furuya-section">
+        <div class="content-overlay"></div>
+        <div class="row about-row">
+            <div class="left-panel">
+                <h2 class="core-values-label">ABOUT</h2>
+                <div class="main-label-wrapper">
+                    <div class="main-label active" id="label-who">Who.</div>
+                    <div class="main-label" id="label-where">Where.</div>
+                    <div class="main-label" id="label-how">How.</div>
+                </div>
+            </div>
+            <div class="right-panel">
+                <p class="about-paragraph">
+                    <span class="right-text-span active" id="text-who">윤희정. 순수미술과 디자인의 경계를 넘나들며, 사람들에게 감각적인 연결의 경험을 전하고자 하는 작업을 합니다.</span>
+                    <span class="right-text-span" id="text-where">Based in Seoul. 서울과학기술대학교 조형예술학과를 전공하고 시각디자인을 복수전공을 하고 다양한 시각작업을 이어갑니다.</span>
+                    <span class="right-text-span" id="text-how">순수미술의 감성과 디자인의 커뮤니케이션 방 방식 결합하여, 사람들에게 오래 남는 경험을 만들고자 합니다.</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div id="transition-band"></div>
+
+    <section id="works-section">
+        <div class="row">
+            <h1 class="works-title">Works</h1>
+            <div class="category-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="painting">Painting</button>
+                <button class="filter-btn" data-filter="photography">Photography</button>
+                <button class="filter-btn" data-filter="drawing">Drawing</button>
+                <button class="filter-btn" data-filter="design">Design</button>
+            </div>
+        </div>
+
+        <div class="row works-grid" id="works-grid">
+            </div>
+    </section>
+
+    <div id="project-modal">
+        <button class="modal-close" id="modal-close">✕</button>
+        <div class="row modal-content">
+            <div class="modal-left">
+                <button class="modal-nav" id="modal-prev">&#10094;</button>
+                <img id="modal-img" src="" alt="">
+                <button class="modal-nav" id="modal-next">&#10095;</button>
+                <p id="modal-counter">1 / 3</p>
+            </div>
+            <div class="modal-right">
+                <h1 id="modal-title">Title</h1>
+                <h2 id="modal-caption">Caption</h2>
+                <p id="modal-desc">Description</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="contact-transition"></div>
+    <footer id="contact-section">
+        <div class="row contact-row">
+            <div class="marquee-wrapper">
+                <div class="marquee">
+                    <span>LET'S WORK TOGETHER — CONTACT ME — </span>
+                    <span>LET'S WORK TOGETHER — CONTACT ME — </span>
+                </div>
+            </div>
+            <div class="contact-links">
+                <a href="mailto:your-email@example.com">Email Me</a>
+                <a href="#" target="_blank">Instagram</a>
+                <a href="#" target="_blank">Behance</a>
+            </div>
+            <p class="footer-copy">© 2026 YoonHeejeong. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        const photoImages = [];
+        for (let i = 1; i <= 13; i++) photoImages.push(`a${i}.jpg`);
+        const drawingImages = [];
+        for (let i = 1; i <= 19; i++) drawingImages.push(`d${i}.jpg`);
+        const designImages = [];
+        for (let i = 1; i <= 5; i++) designImages.push(`g${i}.jpg`);
+        const paintingImagesForBg = [];
+        for (let i = 1; i <= 19; i++) paintingImagesForBg.push(`w${i}.jpg`);
+
+        const allBgImages = [...photoImages, ...drawingImages, ...designImages, ...paintingImagesForBg];
+        allBgImages.sort(() => Math.random() - 0.5);
+
+        const canvas = document.getElementById('global-canvas');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.0005);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 6000);
+        camera.position.z = 500;
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const artworks = [];
+        const textureLoader = new THREE.TextureLoader();
+
+        const REF_HEIGHT = 550; // 기준 높이 (원래 Portrait 크기)
+
+        for (let i = 0; i < 70; i++) {
+            (function(index) {
+                const imgSrc = allBgImages[index % allBgImages.length];
+                
+ 
+                const imgObj = new Image();
+                imgObj.src = imgSrc;
+
+                imgObj.onload = function() {
+                    const aspect = imgObj.width / imgObj.height; 
+                    const geoW = REF_HEIGHT * aspect;
+                    const geoH = REF_HEIGHT;
+
+         
+                    const uniqueGeo = new THREE.PlaneGeometry(geoW, geoH);
+
+                    const texture = textureLoader.load(imgSrc);
+                    const mat = new THREE.MeshBasicMaterial({ 
+                        map: texture, 
+                        side: THREE.DoubleSide, 
+                        transparent: true, 
+                        opacity: 0.95 
+                    });
+                    
+                    const mesh = new THREE.Mesh(uniqueGeo, mat);
+                    mesh.position.set(
+                        (Math.random() - 0.5) * 5000, 
+                        (Math.random() - 0.5) * 5000, 
+                        Math.random() * -6000
+                    );
+                    mesh.rotation.z = (Math.random() - 0.5) * 0.1;
+                    scene.add(mesh); artworks.push(mesh);
+                };
+            })(i);
+        }
+
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function animateThree() {
+            requestAnimationFrame(animateThree);
+            camera.position.x += (mouseX * 1000 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 1000 - camera.position.y) * 0.05;
+            camera.lookAt(0, 0, -2000);
+            artworks.forEach(mesh => { 
+                mesh.position.z += 2; 
+                if (mesh.position.z > camera.position.z + 300) mesh.position.z = -6000; 
+            });
+            renderer.render(scene, camera);
+        }
+        animateThree();
+
+        window.addEventListener('resize', () => { 
+            camera.aspect = window.innerWidth / window.innerHeight; 
+            camera.updateProjectionMatrix(); 
+            renderer.setSize(window.innerWidth, window.innerHeight); 
+        });
+
+        const worksGrid = document.getElementById('works-grid');
+        
+        const paintingGroups = [
+            ['w1.jpg', 'w2.jpg'], ['w3.jpg', 'w4.jpg'], ['w5.jpg'], ['w6.jpg'], ['w7.jpg'],
+            ['w8.jpg'], ['w9.jpg'], ['w10.jpg'], ['w11.jpg', 'w12.jpg'], ['w13.jpg'],
+            ['w14.jpg'], ['w15.jpg'], ['w16.jpg'], ['w17.jpg'], ['w18.jpg', 'w19.jpg']
+        ];
+
+        paintingGroups.forEach((group, idx) => {
+            const num = (idx + 1).toString().padStart(2, '0');
+            const thumb = group[0]; 
+            const dataImagesAttr = group.length > 1 ? `data-images="${group.join(', ')}"` : '';
+            const seriesIconHTML = group.length > 1 ? `<span class="series-icon" style="display:block;">Series</span>` : '';
+
+            const itemHTML = `
+                <div class="row work-item" data-category="painting" data-title="Painting ${num}" data-caption="페인팅 작업, 2024" data-desc="페인팅 작업 ${num}번에 대한 설명입니다." ${dataImagesAttr}>
+                    <div class="img-wrapper">
+                        <img src="${thumb}" alt="Painting ${num}">
+                        ${seriesIconHTML}
+                    </div>
+                    <div class="work-label">
+                        <h2 class="work-item-title">Painting ${num}</h2>
+                        <p class="work-item-category">Painting</p>
+                    </div>
+                </div>`;
+            worksGrid.insertAdjacentHTML('beforeend', itemHTML);
+        });
+
+        photoImages.forEach((img, idx) => {
+            const num = (idx + 1).toString().padStart(2, '0');
+            const itemHTML = `
+                <div class="row work-item" data-category="photography" data-title="Photography ${num}" data-caption="디지털 사진, 2024" data-desc="사진 작업 ${num}번에 대한 설명입니다.">
+                    <div class="img-wrapper"><img src="${img}" alt="Photography ${num}"></div>
+                    <div class="work-label">
+                        <h2 class="work-item-title">Photography ${num}</h2>
+                        <p class="work-item-category">Photography</p>
+                    </div>
+                </div>`;
+            worksGrid.insertAdjacentHTML('beforeend', itemHTML);
+        });
+
+        drawingImages.forEach((img, idx) => {
+            const num = (idx + 1).toString().padStart(2, '0');
+            const itemHTML = `
+                <div class="row work-item" data-category="drawing" data-title="Drawing ${num}" data-caption="드로잉, 2024" data-desc="드로잉 작업 ${num}번에 대한 설명입니다.">
+                    <div class="img-wrapper"><img src="${img}" alt="Drawing ${num}"></div>
+                    <div class="work-label">
+                        <h2 class="work-item-title">Drawing ${num}</h2>
+                        <p class="work-item-category">Drawing</p>
+                    </div>
+                </div>`;
+            worksGrid.insertAdjacentHTML('beforeend', itemHTML);
+        });
+
+        designImages.forEach((img, idx) => {
+            const num = (idx + 1).toString().padStart(2, '0');
+            const itemHTML = `
+                <div class="row work-item" data-category="design" data-title="Design ${num}" data-caption="그래픽 디자인, 2024" data-desc="디자인 작업 ${num}번에 대한 설명입니다.">
+                    <div class="img-wrapper"><img src="${img}" alt="Design ${num}"></div>
+                    <div class="work-label">
+                        <h2 class="work-item-title">Design ${num}</h2>
+                        <p class="work-item-category">Design</p>
+                    </div>
+                </div>`;
+            worksGrid.insertAdjacentHTML('beforeend', itemHTML);
+        });
+
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.to("#blob-svg", { scrollTrigger: { trigger: "#intro-spacer", start: "top top", end: "bottom top", scrub: 1.5 }, scale: 150, ease: "power2.inOut" });
+        gsap.to("#intro-text", { scrollTrigger: { trigger: "#intro-spacer", start: "top top", end: "30% top", scrub: true }, opacity: 0, y: -50 });
+
+        const labels = [document.getElementById('label-who'), document.getElementById('label-where'), document.getElementById('label-how')];
+        const texts = [document.getElementById('text-who'), document.getElementById('text-where'), document.getElementById('text-how')];
+        ScrollTrigger.create({
+            trigger: "#furuya-section", start: "top top", end: "+=300%", pin: true,
+            onUpdate: (self) => {
+                const p = self.progress; let index = 0;
+                if (p > 0.33 && p <= 0.66) index = 1; else if (p > 0.66) index = 2;
+                labels.forEach((lbl, i) => lbl.classList.toggle('active', i === index));
+                texts.forEach((txt, i) => txt.classList.toggle('active', i === index));
+            }
+        });
+
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const workItems = document.querySelectorAll('.work-item');
+
+        function updateLayout(filterValue) {
+            let visibleCount = 0;
+            workItems.forEach(item => {
+                item.classList.remove('show', 'reveal');
+                const category = item.getAttribute('data-category');
+                if (filterValue === 'all' || category === filterValue) {
+                    item.classList.add('show');
+                    setTimeout(() => item.classList.add('reveal'), visibleCount * 50); 
+                    visibleCount++;
+                }
+            });
+            setTimeout(() => ScrollTrigger.refresh(), 500);
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(f => f.classList.remove('active'));
+                btn.classList.add('active');
+                updateLayout(btn.getAttribute('data-filter'));
+            });
+        });
+        
+        updateLayout('all');
+
+        const modal = document.getElementById('project-modal');
+        const modalImg = document.getElementById('modal-img');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCaption = document.getElementById('modal-caption');
+        const modalDesc = document.getElementById('modal-desc');
+        const modalClose = document.getElementById('modal-close');
+        const modalPrev = document.getElementById('modal-prev');
+        const modalNext = document.getElementById('modal-next');
+        const modalCounter = document.getElementById('modal-counter');
+
+        let currentSeries = [];
+        let currentImageIndex = 0;
+
+        function updateModalImage() {
+            modalImg.src = currentSeries[currentImageIndex];
+            modalCounter.innerText = `${currentImageIndex + 1} / ${currentSeries.length}`;
+        }
+
+        workItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const singleImgSrc = item.querySelector('img').src;
+                const imagesAttr = item.getAttribute('data-images');
+                
+                if (imagesAttr) {
+                    currentSeries = imagesAttr.split(',').map(s => s.trim());
+                } else {
+                    currentSeries = [singleImgSrc];
+                }
+                currentImageIndex = 0;
+
+                modalTitle.innerText = item.getAttribute('data-title');
+                modalCaption.innerText = item.getAttribute('data-caption');
+                modalDesc.innerText = item.getAttribute('data-desc');
+
+                if (currentSeries.length > 1) {
+                    modalPrev.style.display = 'flex';
+                    modalNext.style.display = 'flex';
+                    modalCounter.style.display = 'block';
+                } else {
+                    modalPrev.style.display = 'none';
+                    modalNext.style.display = 'none';
+                    modalCounter.style.display = 'none';
+                }
+
+                updateModalImage();
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; 
+            });
+        });
+
+        modalPrev.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            currentImageIndex = (currentImageIndex > 0) ? currentImageIndex - 1 : currentSeries.length - 1;
+            updateModalImage();
+        });
+
+        modalNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentImageIndex = (currentImageIndex < currentSeries.length - 1) ? currentImageIndex + 1 : 0;
+            updateModalImage();
+        });
+
+        modalClose.addEventListener('click', () => {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto'; 
+        });
+
+    </script>
+</body>
+</html>
