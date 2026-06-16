@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YoonHeejeong | Intro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --main-bg-color: #000;
+            --main-text-color: #fff;
+            --inverse-bg-color: #fff;
+            --inverse-text-color: #000;
+            --highlight-color: #888;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body, html {
+            width: 100%; min-height: 100vh;
+            background-color: var(--main-bg-color); color: var(--main-text-color);
+            font-family: 'Pretendard', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+        nav#top-nav {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 2vw 5vw; display: flex; justify-content: space-between;
+            z-index: 100; mix-blend-mode: difference; pointer-events: auto;
+        }
+        .nav-left { display: flex; gap: 3vw; }
+        nav#top-nav a {
+            color: var(--main-text-color); text-decoration: none; text-transform: uppercase;
+            font-size: 0.85vw; font-weight: 400; letter-spacing: 0.1em;
+            transition: opacity 0.3s ease;
+        }
+        nav#top-nav a:hover { opacity: 0.5; }
+        #global-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 1; pointer-events: none; 
+        }
+        #mask-wrapper {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 2; pointer-events: none; display: flex; 
+            align-items: center; justify-content: center;
+            filter: drop-shadow(0px 0px 50px rgba(255, 255, 255, 0.8)) blur(1px);
+        }
+        #blob-svg { 
+            width: 40vmax; height: 40vmax; 
+            transform-origin: 50% 50%; 
+            overflow: visible !important; 
+            filter: blur(15px);
+            will-change: transform; 
+        }
+        #intro-spacer { 
+            position: relative; 
+            width: 100%; 
+            height: 300vh; 
+            z-index: 10; 
+        }
+        #intro-to-about-transition {
+            position: relative;
+            width: 100%;
+            height: 50vh;
+            background: linear-gradient(to bottom, transparent 0%, var(--main-bg-color) 100%);
+        }
+        .row { width: 100%; }
+        section#furuya-section {
+            position: relative; width: 100%; height: 100vh;
+            background-color: var(--main-bg-color);
+            display: flex; align-items: center; padding: 0 5vw;
+            z-index: 20;
+        }
+        .about-row { display: flex; align-items: center; width: 100%; }
+        .left-panel { width: 30%; position: relative; height: 15vw; }
+        .main-label-wrapper { position: relative; width: 100%; height: 10vw; }
+        .main-label {
+            position: absolute; top: 0; left: 0; font-size: 5.5vw;
+            letter-spacing: -0.02em; opacity: 0;
+            transform: translateY(20px); transition: all 0.4s ease;
+            font-family: 'Playfair Display', serif; 
+            font-style: italic; 
+            font-weight: 400; 
+        }
+        .main-label.active { opacity: 1; transform: translateY(0); }
+        .right-panel { width: 70%; padding-left: 4vw; }
+        .about-paragraph { font-size: 2.5vw; font-weight: 400; line-height: 1.3; letter-spacing: -0.01em; }
+        .right-text-span { color: #444; transition: color 0.4s ease; }
+        .right-text-span.active { color: var(--main-text-color); }
+        .works-link-btn {
+            display: inline-block;
+            margin-top: 4vw;
+            background: transparent;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 1vw 3vw;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 1vw;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 30px;
+            opacity: 0; 
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+        .works-link-btn.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .works-link-btn:hover {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+    </style>
+</head>
+<body id="top">
+    <canvas id="global-canvas"></canvas>
+    <div id="mask-wrapper">
+        <svg id="blob-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" style="transform: scale(0.25);">
+            <path fill="#ffffff" fill-rule="evenodd" d="M-99999,-99999 H199999 V199999 H-99999 Z M 50,0 C 50,40 60,50 100,50 C 60,50 50,60 50,100 C 50,60 40,50 0,50 C 40,50 50,40 50,0 Z" />
+        </svg>
+    </div>
+    <nav id="top-nav">
+        <div class="nav-left">
+            <a href="#top">About</a>
+            <a href="works.html">Works</a> <!-- works.html로 수정 -->
+            <a href="works.html#contact-section">Contact</a> <!-- Contact 추가 및 works.html#contact-section 연결 -->
+        </div>
+        <div class="nav-right">
+            <a href="#top">Yoon Hee jeong</a>
+        </div>
+    </nav>
+    <div id="intro-spacer"></div>
+    <div id="intro-to-about-transition"></div>
+    <main id="main-wrap">
+        <section id="furuya-section">
+            <div class="row about-row">
+                <div class="left-panel">
+                    <div class="main-label-wrapper">
+                        <div class="main-label active" id="label-who">Who.</div>
+                        <div class="main-label" id="label-where">Where.</div>
+                        <div class="main-label" id="label-how">How.</div>
+                    </div>
+                </div>
+                <div class="right-panel">
+                    <p class="about-paragraph">
+                        <span class="right-text-span active" id="text-who">윤희정.순수미술과 디자인의 경계를 탐구하며, 감각을 통해<br> 사람들과 연결되는 경험을 만드는 작업을 합니다.<br></span>
+                        <span class="right-text-span" id="text-where">Based in Seoul. 서울과학기술대학교 조형예술학과를 전공하고 시각디자인을 복수전공하며, 회화와 그래픽, 다양한 시각 매체를 넘나드는 작업을 이어가고 있습니다.<br></span>
+                        <span class="right-text-span" id="text-how">조형적 실험과 디자인적 사고를 바탕으로, 단순히 보는 것을 <br>넘어 오래도록 감각되는 경험을 만들고자 합니다.</span>
+                    </p>
+                    <a href="works.html" class="works-link-btn" id="works-btn">WORKS</a> <!-- WORKS 버튼 -->
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        const allBgImages = ['w1.jpg', 'w2.jpg', 'a1.jpg', 'd1.jpg', 'g1.jpg']; 
+        const canvas = document.getElementById('global-canvas');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.0005);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 6000);
+        camera.position.z = 500;
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        const artworks = [];
+        const textureLoader = new THREE.TextureLoader();
+        const REF_HEIGHT = 550; 
+        for (let i = 0; i < 25; i++) {
+            (function(index) {
+                const imgSrc = allBgImages[index % allBgImages.length];
+                const imgObj = new Image();
+                imgObj.src = imgSrc;
+                imgObj.onload = function() {
+                    const aspect = imgObj.width / imgObj.height; 
+                    const geoW = REF_HEIGHT * aspect;
+                    const geoH = REF_HEIGHT;
+                    const uniqueGeo = new THREE.PlaneGeometry(geoW, geoH);
+                    const texture = textureLoader.load(imgSrc);
+                    const mat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true, opacity: 0.95 });
+                    const mesh = new THREE.Mesh(uniqueGeo, mat);
+                    mesh.position.set((Math.random() - 0.5) * 5000, (Math.random() - 0.5) * 5000, Math.random() * -6000);
+                    mesh.rotation.z = (Math.random() - 0.5) * 0.1;
+                    scene.add(mesh); artworks.push(mesh);
+                };
+            })(i);
+        }
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+        function animateThree() {
+            requestAnimationFrame(animateThree);
+            camera.position.x += (mouseX * 1000 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 1000 - camera.position.y) * 0.05;
+            camera.lookAt(0, 0, -2000);
+            
+            artworks.forEach(mesh => { 
+                mesh.position.z += 6; 
+                if (mesh.position.z > camera.position.z + 300) mesh.position.z = -6000; 
+            });
+            renderer.render(scene, camera);
+        }
+        animateThree();
+        window.addEventListener('resize', () => { 
+            camera.aspect = window.innerWidth / window.innerHeight; 
+            camera.updateProjectionMatrix(); 
+            renderer.setSize(window.innerWidth, window.innerHeight); 
+        });
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.to("#blob-svg", { 
+            scrollTrigger: { trigger: "#intro-spacer", start: "top top", end: "bottom bottom", scrub: 1.5 }, 
+            scale: 15, ease: "power2.in" 
+        });
+        ScrollTrigger.create({
+            trigger: "#furuya-section", start: "top top", 
+            onEnter: () => {
+                document.getElementById('global-canvas').style.opacity = '0';
+                document.getElementById('mask-wrapper').style.opacity = '0';
+            },
+            onLeaveBack: () => {
+                document.getElementById('global-canvas').style.opacity = '1';
+                document.getElementById('mask-wrapper').style.opacity = '1';
+            }
+        });
+        const labels = [document.getElementById('label-who'), document.getElementById('label-where'), document.getElementById('label-how')];
+        const texts = [document.getElementById('text-who'), document.getElementById('text-where'), document.getElementById('text-how')];
+        const worksBtn = document.getElementById('works-btn');
+        ScrollTrigger.create({
+            trigger: "#furuya-section", start: "top top", end: "+=300%", pin: true,
+            onUpdate: (self) => {
+                const p = self.progress; let index = 0;
+                if (p > 0.33 && p <= 0.66) index = 1; else if (p > 0.66) index = 2;
+                labels.forEach((lbl, i) => lbl.classList.toggle('active', i === index));
+                texts.forEach((txt, i) => txt.classList.toggle('active', i === index));
+                
+                if(index === 2) {
+                    worksBtn.classList.add('show');
+                } else {
+                    worksBtn.classList.remove('show');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
